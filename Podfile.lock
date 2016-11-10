@@ -1,0 +1,18 @@
+PODS:
+  - MOLAuthenticatingURLSession (2.1):
+    - MOLCertificate (~> 1.5)
+  - MOLCertificate (1.5)
+  - OCMock (3.3.1)
+
+DEPENDENCIES:
+  - MOLAuthenticatingURLSession
+  - OCMock
+
+SPEC CHECKSUMS:
+  MOLAuthenticatingURLSession: 2f0fd35f641bc857ee1b026021dbd759955adaa3
+  MOLCertificate: c39cae866d24d36fbc78032affff83d401b5384a
+  OCMock: f3f61e6eaa16038c30caa5798c5e49d3307b6f22
+
+PODFILE CHECKSUM: a4fdf6b94e76c7c0162168a4bca38eed82df7da6
+
+COCOAPODS: 1.0.1
