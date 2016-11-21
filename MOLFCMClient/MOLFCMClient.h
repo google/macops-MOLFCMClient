@@ -45,7 +45,7 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
 @property(copy) MOLFCMConnectionErrorHandler connectionErrorHandler;
 
 /**  If set, this block will be called with a string argument during certain debug events. */
-@property(copy) void (^loggingBlock)(NSString *);
+@property(copy, nonatomic) void (^loggingBlock)(NSString *);
 
 /**  Use initWithFCMToken:sessionConfiguration:messageHandler: */
 - (instancetype)init NS_UNAVAILABLE;
