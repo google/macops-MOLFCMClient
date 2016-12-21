@@ -37,7 +37,11 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
  *
  *  @note The following errors are handled:
  *          NSURLErrorTimedOut
+ *          NSURLErrorCannotFindHost
+ *          NSURLErrorCannotConnectToHost
  *          NSURLErrorNetworkConnectionLost
+ *          NSURLErrorDNSLookupFailed
+ *          NSURLErrorResourceUnavailable
  *          NSURLErrorNotConnectedToInternet
  *
  *  @note Any other errors will execute this block with the error as the parameter.

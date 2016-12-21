@@ -117,7 +117,7 @@
 - (void)testProcessMessagesFromData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {
+                                              messageHandler:^(NSDictionary *message) {
                                                XCTAssertEqualObjects(message, @{});
                                              }];
   [fcm processMessagesFromData:[@"10 [[0,[{}]]]10 [[0,[{}]]]"
@@ -127,7 +127,7 @@
 - (void)testProcessMessagesFromNilData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {
+                                              messageHandler:^(NSDictionary *message) {
                                                XCTFail();
                                              }];
   [fcm processMessagesFromData:nil];
@@ -136,7 +136,7 @@
 - (void)testProcessMessagesFromOverIndexedData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {
+                                              messageHandler:^(NSDictionary *message) {
                                                XCTFail();
                                              }];
   [fcm processMessagesFromData:[@"100 [[0,[{}]]]" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -145,7 +145,7 @@
 - (void)testProcessMessagesFromMangledData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {
+                                              messageHandler:^(NSDictionary *message) {
                                                XCTFail();
                                              }];
   [fcm processMessagesFromData:[@"~!@#$\0%^&*()_+=" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -155,12 +155,11 @@
   MOLAuthenticatingURLSession *session = [[MOLAuthenticatingURLSession alloc] init];
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {
+                                              messageHandler:^(NSDictionary *message) {
                                                XCTAssertEqualObjects(message, @{});
                                              }];
   fcm.authSession = session;
-  fcm.session = nil;
-  [fcm startReadingMessages];
+  [fcm connect];
   [session URLSession:session.session
              dataTask:nil
        didReceiveData:[@"10 [[0,[{}]]]" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -170,12 +169,11 @@
   MOLAuthenticatingURLSession *session = [[MOLAuthenticatingURLSession alloc] init];
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {
+                                              messageHandler:^(NSDictionary *message) {
                                                XCTFail();
                                              }];
   fcm.authSession = session;
-  fcm.session = nil;
-  [fcm startReadingMessages];
+  [fcm connect];
   [session URLSession:session.session
              dataTask:nil
        didReceiveData:[@"No Message" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -184,21 +182,21 @@
 - (void)testAckMessage {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {}];
+                                              messageHandler:^(NSDictionary *message) {}];
   NSHTTPURLResponse *resp = [self responseWithCode:200 headerDict:nil];
   [self stubRequestBody:nil response:resp error:nil validateBlock:^BOOL(NSURLRequest *req) {
     return YES;
   }];
-  fcm.ackErrorHandler = ^(NSDictionary *m, NSError *error) {
+  fcm.acknowledgeErrorHandler = ^(NSDictionary *m, NSError *error) {
     XCTFail();
   };
-  [fcm ackMessage:@{ @"message_id" : @"123" }];
+  [fcm acknowledgeMessage:@{ @"message_id" : @"123" }];
 }
 
 - (void)testAckMessageFail {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {}];
+                                              messageHandler:^(NSDictionary *message) {}];
   NSHTTPURLResponse *resp = [self responseWithCode:500 headerDict:nil];
   NSError *err = [NSError errorWithDomain:@"com.google.corp.MOLNotificationsClient"
                                      code:-1
@@ -206,17 +204,17 @@
   [self stubRequestBody:nil response:resp error:err validateBlock:^BOOL(NSURLRequest *req) {
     return YES;
   }];
-  fcm.ackErrorHandler = ^(NSDictionary *m, NSError *error) {
+  fcm.acknowledgeErrorHandler = ^(NSDictionary *m, NSError *error) {
     XCTAssertEqualObjects(m, @{ @"message_id" : @"123" });
     XCTAssertEqual(error.code, -1);
   };
-  [fcm ackMessage:@{ @"message_id" : @"123" }];
+  [fcm acknowledgeMessage:@{ @"message_id" : @"123" }];
 }
 
 - (void)testDescription {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {}];
+                                              messageHandler:^(NSDictionary *message) {}];
   NSString *e = [NSString stringWithFormat:@"<MOLFCMClient: %p>\n"
                  @"bind: https://fcm.googleapis.com/fcm/connect/bind?token=123\n"
                  @"ack: https://fcm.googleapis.com/fcm/connect/ack", fcm];
@@ -226,7 +224,7 @@
 - (void)testLog {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
                                         sessionConfiguration:nil
-                                             messagesHandler:^(NSDictionary *message) {}];
+                                              messageHandler:^(NSDictionary *message) {}];
   fcm.loggingBlock = ^(NSString *log) {
     XCTAssertEqualObjects(log, @"test log");
   };

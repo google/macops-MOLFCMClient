@@ -262,7 +262,11 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
     if (httpResponse.statusCode == 200) {
       [strongSelf connect];
     } else if (error.code == NSURLErrorTimedOut ||
+               error.code == NSURLErrorCannotFindHost ||
+               error.code == NSURLErrorCannotConnectToHost ||
                error.code == NSURLErrorNetworkConnectionLost ||
+               error.code == NSURLErrorDNSLookupFailed ||
+               error.code == NSURLErrorResourceUnavailable ||
                error.code == NSURLErrorNotConnectedToInternet) {
 #ifdef DEBUG
       [strongSelf log:[NSString stringWithFormat:@"%@", error]];
