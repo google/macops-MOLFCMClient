@@ -34,9 +34,6 @@ static NSString *const kFCMContentType = @"Content-Type";
 #pragma mark MOLFCMClient Extension
 
 @interface MOLFCMClient() {
-  /**  Is used throughout the class to reconnect to FCM after a connection loss. */
-  SCNetworkReachabilityRef _reachability;
-
   /**  URL components for receiving and acknowledging messages. */
   NSURLComponents *_bindComponents;
   NSURLComponents *_acknowledgeComponents;
@@ -54,6 +51,9 @@ static NSString *const kFCMContentType = @"Content-Type";
 /**  Property to keep track of FCM's reachability. */
 @property(nonatomic) BOOL reachable;
 
+/**  Is used throughout the class to reconnect to FCM after a connection loss. */
+@property SCNetworkReachabilityRef reachability;
+
 @end
 
 #pragma mark SCNetworkReachabilityCallBack
@@ -61,12 +61,14 @@ static NSString *const kFCMContentType = @"Content-Type";
 /**  Called when the network state changes. */
 static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags,
                                 void *info) {
-  MOLFCMClient *FCMClient = (__bridge MOLFCMClient *)info;
-  // Only call the setter when there is a change. This will filter out the redundant calls to this
-  // callback whenever the network interface states change.
-  if (FCMClient.reachable != (flags & kSCNetworkReachabilityFlagsReachable)) {
-    FCMClient.reachable = (flags & kSCNetworkReachabilityFlagsReachable);
-  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    MOLFCMClient *FCMClient = (__bridge MOLFCMClient *)info;
+    // Only call the setter when there is a change. This will filter out the redundant calls to this
+    // callback whenever the network interface states change.
+    if (FCMClient.reachable != (flags & kSCNetworkReachabilityFlagsReachable)) {
+      FCMClient.reachable = (flags & kSCNetworkReachabilityFlagsReachable);
+    }
+  });
 }
 
 @implementation MOLFCMClient
@@ -132,27 +134,27 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
 /**  Start listening for network state changes on a background thread. */
 - (void)startReachability {
-  if (_reachability) return;
-  _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, kFCMHost.UTF8String);
+  if (self.reachability) return;
+  self.reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, kFCMHost.UTF8String);
   SCNetworkReachabilityContext context = {
     .info = (__bridge void *)self
   };
-  if (SCNetworkReachabilitySetCallback(_reachability, reachabilityHandler, &context)) {
+  if (SCNetworkReachabilitySetCallback(self.reachability, reachabilityHandler, &context)) {
     SCNetworkReachabilitySetDispatchQueue(
-        _reachability, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
+        self.reachability, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
   }
 }
 
 /**  Stop listening for network state changes. */
 - (void)stopReachability {
-  if (_reachability) {
-    if (SCNetworkReachabilitySetDispatchQueue(_reachability, NULL)) {
+  if (self.reachability) {
+    if (SCNetworkReachabilitySetDispatchQueue(self.reachability, NULL)) {
 #ifdef DEBUG
       [self log:@"Reachability Thread Stopped"];
 #endif
     }
-    CFRelease(_reachability);
-    _reachability = NULL;
+    if (self.reachability) CFRelease(self.reachability);
+    self.reachability = NULL;
   }
 }
 
