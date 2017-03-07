@@ -135,7 +135,8 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 /**  Start listening for network state changes on a background thread. */
 - (void)startReachability {
   if (self.reachability) return;
-  self.reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, kFCMHost.UTF8String);
+  self.reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault,
+                                                          _bindComponents.host.UTF8String);
   SCNetworkReachabilityContext context = {
     .info = (__bridge void *)self
   };
