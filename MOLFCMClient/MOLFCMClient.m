@@ -219,7 +219,6 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
   // Loop until all of the messages are digested
   while (1) {
-
     // At the start of each loop raw should contain the length of the next message followed
     // by a new line
     NSInteger length = [raw integerValue];
@@ -232,15 +231,14 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
     // Read the next message
     if (length > raw.length) break;
-    NSData *messageData = [NSData dataWithBytes:[raw substringToIndex:length].UTF8String
-                                         length:length];
+    NSData *messageData = [[raw substringToIndex:length] dataUsingEncoding:NSUTF8StringEncoding];
     [raw deleteCharactersInRange:NSMakeRange(0, length)];
 
-    // Serialize the message
+    // Parse the message
     id JSONObject = [NSJSONSerialization JSONObjectWithData:messageData options:0 error:NULL];
 
     // Ensure the message is in the proper format and handle it
-    NSDictionary *message = [self extractMessage:JSONObject];
+    NSDictionary *message = [self extractMessageFrom:JSONObject];
     if ([message[@"message_type"] isEqualToString:@"control"] &&
         [message[@"control_type"] isEqualToString:@"CONNECTION_DRAINING"]) {
       return [self cancelConnections];
@@ -255,9 +253,9 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
  *
  *  @param jo The JSON object containing the message
  *
- *  @return A NSDictionary message
+ *  @return An NSDictionary message
  */
-- (NSDictionary *)extractMessage:(id)jo {
+- (NSDictionary *)extractMessageFrom:(id)jo {
   if (!jo) return nil;
   if (![jo isKindOfClass:[NSArray class]]) return nil;
   if (![[jo firstObject] isKindOfClass:[NSArray class]]) return nil;
