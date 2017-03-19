@@ -19,7 +19,7 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 
 /**  The FCM production host URL. */
-static NSString *const kFCMHost = @"https://fcm.googleapis.com";
+static NSString *const kFCMHost = @"https://fcm-stream.googleapis.com";
 
 /**  The FCM long poll component for receiving messages. */
 static NSString *const kFCMMessagesBindPath = @"/fcm/connect/bind";
@@ -203,33 +203,66 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
   }];
 }
 
-/**  Recursively parse FCM data; extract and call self.messageHandler for each message. */
+/**
+ *  Parse FCM data; extract and call self.messageHandler for each message.
+ *
+ *  Expected format:
+ *    10
+ *    [[0,[{}]]]10
+ *    [[1,[{}]]]
+ *
+ */
 - (void)processMessagesFromData:(NSData *)data {
   if (!data) return;
-  // The FCM buffer indexes each message with a length prefixing the message.
-  // Use strtol() to find this index then digest the data for that given length.
-  // leftOver will then have all the undigested bytes. Recursively call this method until the whole
-  // buffer has been digested.
-  char *leftOver = NULL;
-  long length = strtol(data.bytes, &leftOver, 0);
-  if (length >= 1 && data.length >= length) {
-    NSData *dataChunk = [[NSData alloc] initWithBytes:++leftOver length:length];
-    NSArray *jsonObject = [NSJSONSerialization JSONObjectWithData:dataChunk
-                                                          options:NSJSONReadingAllowFragments
-                                                            error:NULL];
-    NSDictionary *message = [[[jsonObject firstObject] lastObject] firstObject];
+
+  // Get the string representation of the data
+  NSMutableString *raw = [[NSMutableString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+  // Loop until all of the messages are digested
+  while (1) {
+    // At the start of each loop raw should contain the length of the next message followed
+    // by a new line
+    NSInteger length = [raw integerValue];
+    if (!length) break;
+
+    // Remove the length line
+    NSRange r = [raw rangeOfString:@"\n"];
+    if (r.location == NSNotFound) break;
+    [raw deleteCharactersInRange:NSMakeRange(0, r.location + 1)];
+
+    // Read the next message
+    if (length > raw.length) break;
+    NSData *messageData = [[raw substringToIndex:length] dataUsingEncoding:NSUTF8StringEncoding];
+    [raw deleteCharactersInRange:NSMakeRange(0, length)];
+
+    // Parse the message
+    id JSONObject = [NSJSONSerialization JSONObjectWithData:messageData options:0 error:NULL];
+
+    // Ensure the message is in the proper format and handle it
+    NSDictionary *message = [self extractMessageFrom:JSONObject];
     if ([message[@"message_type"] isEqualToString:@"control"] &&
         [message[@"control_type"] isEqualToString:@"CONNECTION_DRAINING"]) {
       return [self cancelConnections];
     } else if (message) {
       self.messageHandler(message);
     }
-    NSData *nextChunk = [[NSData alloc] initWithBytes:leftOver + dataChunk.length
-                                               length:data.length - dataChunk.length];
-    if (nextChunk) {
-      return [self processMessagesFromData:nextChunk];
-    }
   }
+}
+
+/**
+ *  Extract the enclosed message
+ *
+ *  @param jo The JSON object containing the message
+ *
+ *  @return An NSDictionary message
+ */
+- (NSDictionary *)extractMessageFrom:(id)jo {
+  if (!jo) return nil;
+  if (![jo isKindOfClass:[NSArray class]]) return nil;
+  if (![[jo firstObject] isKindOfClass:[NSArray class]]) return nil;
+  if (![[[jo firstObject] lastObject] isKindOfClass:[NSArray class]]) return nil;
+  if (![[[[jo firstObject] lastObject] firstObject] isKindOfClass:[NSDictionary class]]) return nil;
+  return [[[jo firstObject] lastObject] firstObject];
 }
 
 #pragma mark NSURLSession block property and methods
@@ -255,7 +288,7 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
  *
  *  TODO:(bur) Follow up with FCM on Content-Type: application/json. Currently FCM returns data with
  *  Content-Type: text/html. Messages under 512 bytes will not be processed until the connection
- *  drains. This is done every ~3 minutes.
+ *  drains.
  */
 - (void (^)(NSURLSession *, NSURLSessionTask *, NSError *))taskDidCompleteWithErrorBlock {
   __weak __typeof(self) weakSelf = self;
