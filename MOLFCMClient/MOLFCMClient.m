@@ -32,7 +32,7 @@ static NSString *const kFCMApplicationJSON = @"application/json";
 static NSString *const kFCMContentType = @"Content-Type";
 
 /**  15 minute backoff maximum */
-static uint32_t kBackoffMaxSeconds = 900;
+static const uint32_t kBackoffMaxSeconds = 900;
 
 #pragma mark MOLFCMClient Extension
 

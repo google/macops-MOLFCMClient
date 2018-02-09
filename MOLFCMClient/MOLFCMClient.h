@@ -58,7 +58,7 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
  *  Opens a connection to FCM and starts listening for messages.
  *
  *  @note If there is a failure in the connection, reconnection will occur once FCM is reachable.
- *        Failed reconnections will backoff exponentially upto a max of 15 mins.
+ *        Failed reconnections will backoff exponentially up to a max of 15 mins.
  */
 - (void)connect;
 
