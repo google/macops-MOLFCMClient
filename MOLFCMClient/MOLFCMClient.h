@@ -17,9 +17,6 @@
 /**  A block that takes a NSDictionary object as an argument. */
 typedef void (^MOLFCMMessageHandler)(NSDictionary *);
 
-/**  A block that takes a NSError object as an argument. */
-typedef void (^MOLFCMConnectionErrorHandler)(NSError *);
-
 /**  A block that takes a NSDictionary and NSError object as arguments. */
 typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
 
@@ -29,24 +26,11 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
 /**  Holds the FCM token */
 @property(readonly, nonatomic) NSString *FCMToken;
 
+/**  Returns YES if connected to FCM. */
+@property(readonly, nonatomic) BOOL isConnected;
+
 /**  A block to be executed when there is an issue with acknowledging a message. */
 @property(copy) MOLFCMAcknowledgeErrorHandler acknowledgeErrorHandler;
-
-/**
- *  A block to be executed when there is a non-recoverable issue with the FCM Connection.
- *
- *  @note The following errors are handled:
- *          NSURLErrorTimedOut
- *          NSURLErrorCannotFindHost
- *          NSURLErrorCannotConnectToHost
- *          NSURLErrorNetworkConnectionLost
- *          NSURLErrorDNSLookupFailed
- *          NSURLErrorResourceUnavailable
- *          NSURLErrorNotConnectedToInternet
- *
- *  @note Any other errors will execute this block with the error as the parameter.
- */
-@property(copy) MOLFCMConnectionErrorHandler connectionErrorHandler;
 
 /**  If set, this block will be called with a string argument during certain debug events. */
 @property(copy, nonatomic) void (^loggingBlock)(NSString *);
@@ -73,8 +57,8 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
 /**
  *  Opens a connection to FCM and starts listening for messages.
  *
- *  @note If there is a failure in the connection, a thread will wait until FCM is reachable and
- *        try connecting again.
+ *  @note If there is a failure in the connection, reconnection will occur once FCM is reachable.
+ *        Failed reconnections will backoff exponentially up to a max of 15 mins.
  */
 - (void)connect;
 
