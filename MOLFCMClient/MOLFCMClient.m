@@ -31,8 +31,11 @@ static NSString *const kFCMMessagesAckPath = @"/fcm/connect/ack";
 static NSString *const kFCMApplicationJSON = @"application/json";
 static NSString *const kFCMContentType = @"Content-Type";
 
-/**  15 minute backoff maximum */
+/**  Default 15 minute backoff maximum */
 static const uint32_t kBackoffMaxSeconds = 900;
+
+/**  Default 10 sec connect delay maximum */
+static const uint32_t kConnectDelayMaxSeconds = 10;
 
 #pragma mark MOLFCMClient Extension
 
@@ -46,6 +49,10 @@ static const uint32_t kBackoffMaxSeconds = 900;
 
   /**  Holds the current backoff seconds. */
   uint32_t _backoffSeconds;
+
+  NSArray<NSNumber *> *_fatalHTTPStatusCodes;
+  uint32_t _connectDelayMaxSeconds;
+  uint32_t _backoffMaxSeconds;
 }
 
 /**  NSURLSession wrapper used for https communication with the FCM service. */
@@ -82,19 +89,23 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 #pragma mark init/dealloc methods
 
 - (instancetype)initWithFCMToken:(NSString *)FCMToken
+                            host:(NSString *)host
+                 connectDelayMax:(uint32_t)connectDelayMax
+                      backoffMax:(uint32_t)backoffMax
+                      fatalCodes:(NSArray<NSNumber *> *)fatalCodes
             sessionConfiguration:(NSURLSessionConfiguration *)sessionConfiguration
                   messageHandler:(MOLFCMMessageHandler)messageHandler {
   self = [super init];
   if (self) {
     _FCMToken = [FCMToken copy];
-    _bindComponents = [NSURLComponents componentsWithString:kFCMHost];
+    _bindComponents = [NSURLComponents componentsWithString:host ?: kFCMHost];
     _bindComponents.path = kFCMMessagesBindPath;
     NSURLQueryItem *tokenQuery = [NSURLQueryItem queryItemWithName:@"token" value:FCMToken];
     if (tokenQuery) {
       _bindComponents.queryItems = @[ tokenQuery ];
     }
 
-    _acknowledgeComponents = [NSURLComponents componentsWithString:kFCMHost];
+    _acknowledgeComponents = [NSURLComponents componentsWithString:host ?: kFCMHost];
     _acknowledgeComponents.path = kFCMMessagesAckPath;
     _messageHandler = messageHandler;
 
@@ -105,8 +116,23 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
     _authSession.taskDidCompleteWithErrorBlock = [self taskDidCompleteWithErrorBlock];
 
     _session = _authSession.session;
+
+    _connectDelayMaxSeconds = connectDelayMax ?: kConnectDelayMaxSeconds;
+    _backoffMaxSeconds = backoffMax ?: kBackoffMaxSeconds;
+    _fatalHTTPStatusCodes = fatalCodes ?: @[@302, @400, @403];
   }
   return self;
+}
+
+- (instancetype)initWithFCMToken:(NSString *)FCMToken
+                  messageHandler:(MOLFCMMessageHandler)messageHandler {
+  return [self initWithFCMToken:FCMToken
+                           host:nil
+                connectDelayMax:0
+                     backoffMax:0
+                     fatalCodes:nil
+           sessionConfiguration:nil
+                 messageHandler:messageHandler];
 }
 
 /**  Before this object is released ensure reachability release. */
@@ -139,7 +165,7 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
     [self log:[NSString stringWithFormat:log, _backoffSeconds]];
 #endif
     [self stopReachability];
-    [self performSelector:@selector(connect) withObject:nil afterDelay:_backoffSeconds];
+    [self performSelector:@selector(connectHelper) withObject:nil afterDelay:_backoffSeconds];
   }
 }
 
@@ -172,6 +198,12 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 #pragma mark message methods
 
 - (void)connect {
+  uint32_t ms = arc4random_uniform(_connectDelayMaxSeconds * 1000);
+  NSTimeInterval jitter = ms / 1000.0;
+  [self performSelector:@selector(connectHelper) withObject:nil afterDelay:jitter];
+}
+
+- (void)connectHelper {
 #ifdef DEBUG
   [self log:@"Connecting..."];
 #endif
@@ -307,15 +339,21 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
   __weak __typeof(self) weakSelf = self;
   return ^(NSURLSession *session, NSURLSessionTask *task, NSError *error) {
     __typeof(self) strongSelf = weakSelf;
+    if (![task.response isKindOfClass:[NSHTTPURLResponse class]]) {
+      if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(nil, error);
+      return;
+    }
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
     if (httpResponse.statusCode == 200) {
       _backoffSeconds = 0;
-      [strongSelf connect];
+      [strongSelf connectHelper];
+    } else if ([_fatalHTTPStatusCodes containsObject:@(httpResponse.statusCode)]) {
+      if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(httpResponse, error);
     } else {
       // If no backoff is set, start out with 5 - 15 seconds.
       // If a backoff is already set, double it, with a max of kBackoffMaxSeconds.
       _backoffSeconds = _backoffSeconds * 2 ?: arc4random_uniform(11) + 5;
-      if (_backoffSeconds > kBackoffMaxSeconds) _backoffSeconds = kBackoffMaxSeconds;
+      if (_backoffSeconds > _backoffMaxSeconds) _backoffSeconds = _backoffMaxSeconds;
 #ifdef DEBUG
       if (error) [strongSelf log:[NSString stringWithFormat:@"%@", error]];
 #endif

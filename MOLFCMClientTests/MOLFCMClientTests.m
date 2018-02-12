@@ -116,7 +116,6 @@
 
 - (void)testProcessMessagesFromData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTAssertEqualObjects(message, @{});
   }];
@@ -139,7 +138,6 @@
 
 - (void)testProcessMessagesFromNilData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTFail();
   }];
@@ -148,7 +146,6 @@
 
 - (void)testProcessMessagesFromOverIndexedData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTFail();
   }];
@@ -161,7 +158,6 @@
 
 - (void)testProcessMessagesFromMangledData {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTFail();
   }];
@@ -171,7 +167,6 @@
 - (void)testProcessMessagesBadFormat {
   __block int count = 0;
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTAssertEqual(++count, 1);
   }];
@@ -187,7 +182,6 @@
 - (void)testReadMessageSuccess {
   MOLAuthenticatingURLSession *session = [[MOLAuthenticatingURLSession alloc] init];
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTAssertEqualObjects(message, @{});
   }];
@@ -201,7 +195,6 @@
 - (void)testReadMessageFail {
   MOLAuthenticatingURLSession *session = [[MOLAuthenticatingURLSession alloc] init];
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {
     XCTFail();
   }];
@@ -214,7 +207,6 @@
 
 - (void)testAckMessage {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {}];
   NSHTTPURLResponse *resp = [self responseWithCode:200 headerDict:nil];
   [self stubRequestBody:nil response:resp error:nil validateBlock:^BOOL(NSURLRequest *req) {
@@ -228,7 +220,6 @@
 
 - (void)testAckMessageFail {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {}];
   NSHTTPURLResponse *resp = [self responseWithCode:500 headerDict:nil];
   NSError *err = [NSError errorWithDomain:@"com.google.corp.MOLNotificationsClient"
@@ -246,7 +237,6 @@
 
 - (void)testDescription {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {}];
   NSString *e = [NSString stringWithFormat:@"<MOLFCMClient: %p>\n"
                     @"bind: https://fcm-stream.googleapis.com/fcm/connect/bind?token=123\n"
@@ -256,7 +246,6 @@
 
 - (void)testLog {
   MOLFCMClient *fcm = [[MOLFCMClient alloc] initWithFCMToken:@"123"
-                                        sessionConfiguration:nil
                                               messageHandler:^(NSDictionary *message) {}];
   fcm.loggingBlock = ^(NSString *log) {
     XCTAssertEqualObjects(log, @"test log");
