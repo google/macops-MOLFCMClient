@@ -50,9 +50,11 @@ static const uint32_t kConnectDelayMaxSeconds = 10;
   /**  Holds the current backoff seconds. */
   uint32_t _backoffSeconds;
 
-  NSArray<NSNumber *> *_fatalHTTPStatusCodes;
+  /**  Holds the max connect and backoff seconds. */
   uint32_t _connectDelayMaxSeconds;
   uint32_t _backoffMaxSeconds;
+
+  NSArray<NSNumber *> *_fatalHTTPStatusCodes;
 }
 
 /**  NSURLSession wrapper used for https communication with the FCM service. */
