@@ -32,10 +32,10 @@ static NSString *const kFCMApplicationJSON = @"application/json";
 static NSString *const kFCMContentType = @"Content-Type";
 
 /**  Default 15 minute backoff maximum */
-static const uint32_t kBackoffMaxSeconds = 900;
+static const uint32_t kDefaultBackoffMaxSeconds = 900;
 
 /**  Default 10 sec connect delay maximum */
-static const uint32_t kConnectDelayMaxSeconds = 10;
+static const uint32_t kDefaultConnectDelayMaxSeconds = 10;
 
 #pragma mark MOLFCMClient Extension
 
@@ -119,11 +119,23 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
     _session = _authSession.session;
 
-    _connectDelayMaxSeconds = connectDelayMax ?: kConnectDelayMaxSeconds;
-    _backoffMaxSeconds = backoffMax ?: kBackoffMaxSeconds;
+    _connectDelayMaxSeconds = connectDelayMax ?: kDefaultConnectDelayMaxSeconds;
+    _backoffMaxSeconds = backoffMax ?: kDefaultBackoffMaxSeconds;
     _fatalHTTPStatusCodes = fatalCodes ?: @[@302, @400, @403];
   }
   return self;
+}
+
+- (instancetype)initWithFCMToken:(NSString *)FCMToken
+            sessionConfiguration:(NSURLSessionConfiguration *)sessionConfiguration
+                  messageHandler:(MOLFCMMessageHandler)messageHandler {
+  return [self initWithFCMToken:FCMToken
+                           host:nil
+                connectDelayMax:0
+                     backoffMax:0
+                     fatalCodes:nil
+           sessionConfiguration:sessionConfiguration
+                 messageHandler:messageHandler];
 }
 
 - (instancetype)initWithFCMToken:(NSString *)FCMToken

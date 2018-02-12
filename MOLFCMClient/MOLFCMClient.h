@@ -73,6 +73,11 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
 
 /**  A convenience initializer. Optional args will use their zero values. */
 - (instancetype)initWithFCMToken:(NSString *)FCMToken
+            sessionConfiguration:(NSURLSessionConfiguration *)sessionConfiguration
+                  messageHandler:(MOLFCMMessageHandler)messageHandler;
+
+/**  A convenience initializer. Optional args will use their zero values. */
+- (instancetype)initWithFCMToken:(NSString *)FCMToken
                   messageHandler:(MOLFCMMessageHandler)messageHandler;
 
 /**
