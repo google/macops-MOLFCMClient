@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		3CC4A73D472D8FFFDBAB2C11 /* libPods-MOLFCMClient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 49316294A5668E207F936A33 /* libPods-MOLFCMClient.a */; };
+		58ECF3130D9AE3A318718CE2 /* libPods-test_client.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1909E978142AC9A61F6147A /* libPods-test_client.a */; };
+		C7671BFA2031EDD7005EB525 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C7671BF92031EDD7005EB525 /* main.m */; };
+		C7671BFE2031EF47005EB525 /* MOLFCMClient.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D5F15A1DB0208200F5F4DD /* MOLFCMClient.m */; };
 		C7D5F1591DB0208200F5F4DD /* MOLFCMClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D5F1581DB0208200F5F4DD /* MOLFCMClient.h */; };
 		C7D5F15B1DB0208200F5F4DD /* MOLFCMClient.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D5F15A1DB0208200F5F4DD /* MOLFCMClient.m */; };
 		C7D5F16A1DB021F600F5F4DD /* MOLFCMClientTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D5F1691DB021F600F5F4DD /* MOLFCMClientTests.m */; };
@@ -25,22 +28,47 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		C7671BF52031EDD7005EB525 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		047016489C9BBAFEEC14F0A4 /* Pods-test_client.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test_client.release.xcconfig"; path = "Pods/Target Support Files/Pods-test_client/Pods-test_client.release.xcconfig"; sourceTree = "<group>"; };
 		2B9DBF2E1EC400C48AF21630 /* Pods-MOLFCMClient.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MOLFCMClient.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MOLFCMClient/Pods-MOLFCMClient.debug.xcconfig"; sourceTree = "<group>"; };
 		49316294A5668E207F936A33 /* libPods-MOLFCMClient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MOLFCMClient.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DF6E32C51D2C24FEAE01A5C /* Pods-MOLFCMClient.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MOLFCMClient.release.xcconfig"; path = "Pods/Target Support Files/Pods-MOLFCMClient/Pods-MOLFCMClient.release.xcconfig"; sourceTree = "<group>"; };
 		63845C01091D90E009C7EA3B /* libPods-MOLFCMClientTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MOLFCMClientTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F37B52C9899F8948B22F59B /* Pods-MOLFCMClientTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MOLFCMClientTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MOLFCMClientTests/Pods-MOLFCMClientTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9ACF5FE480BE1B2122A53943 /* Pods-MOLFCMClientTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MOLFCMClientTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-MOLFCMClientTests/Pods-MOLFCMClientTests.release.xcconfig"; sourceTree = "<group>"; };
+		AFC69D50B92E9DDB838C186B /* Pods-test_client.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test_client.debug.xcconfig"; path = "Pods/Target Support Files/Pods-test_client/Pods-test_client.debug.xcconfig"; sourceTree = "<group>"; };
+		C7671BF72031EDD7005EB525 /* test_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_client; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7671BF92031EDD7005EB525 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C7D5F1551DB0208200F5F4DD /* libMOLFCMClient.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libMOLFCMClient.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7D5F1581DB0208200F5F4DD /* MOLFCMClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MOLFCMClient.h; sourceTree = "<group>"; };
 		C7D5F15A1DB0208200F5F4DD /* MOLFCMClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MOLFCMClient.m; sourceTree = "<group>"; };
 		C7D5F1671DB021F600F5F4DD /* MOLFCMClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MOLFCMClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7D5F1691DB021F600F5F4DD /* MOLFCMClientTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MOLFCMClientTests.m; sourceTree = "<group>"; };
 		C7D5F16B1DB021F600F5F4DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D1909E978142AC9A61F6147A /* libPods-test_client.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-test_client.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C7671BF42031EDD7005EB525 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				58ECF3130D9AE3A318718CE2 /* libPods-test_client.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C7D5F1521DB0208200F5F4DD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -66,8 +94,17 @@
 			children = (
 				49316294A5668E207F936A33 /* libPods-MOLFCMClient.a */,
 				63845C01091D90E009C7EA3B /* libPods-MOLFCMClientTests.a */,
+				D1909E978142AC9A61F6147A /* libPods-test_client.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C7671BF82031EDD7005EB525 /* test_client */ = {
+			isa = PBXGroup;
+			children = (
+				C7671BF92031EDD7005EB525 /* main.m */,
+			);
+			path = test_client;
 			sourceTree = "<group>";
 		};
 		C7D5F14C1DB0208200F5F4DD = {
@@ -75,6 +112,7 @@
 			children = (
 				C7D5F1571DB0208200F5F4DD /* MOLFCMClient */,
 				C7D5F1681DB021F600F5F4DD /* MOLFCMClientTests */,
+				C7671BF82031EDD7005EB525 /* test_client */,
 				C7D5F1561DB0208200F5F4DD /* Products */,
 				D56CF6A33BB8088A3C5A458E /* Pods */,
 				C46C5B18C29B9E474B7564B1 /* Frameworks */,
@@ -86,6 +124,7 @@
 			children = (
 				C7D5F1551DB0208200F5F4DD /* libMOLFCMClient.dylib */,
 				C7D5F1671DB021F600F5F4DD /* MOLFCMClientTests.xctest */,
+				C7671BF72031EDD7005EB525 /* test_client */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -115,6 +154,8 @@
 				5DF6E32C51D2C24FEAE01A5C /* Pods-MOLFCMClient.release.xcconfig */,
 				8F37B52C9899F8948B22F59B /* Pods-MOLFCMClientTests.debug.xcconfig */,
 				9ACF5FE480BE1B2122A53943 /* Pods-MOLFCMClientTests.release.xcconfig */,
+				AFC69D50B92E9DDB838C186B /* Pods-test_client.debug.xcconfig */,
+				047016489C9BBAFEEC14F0A4 /* Pods-test_client.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -133,6 +174,25 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		C7671BF62031EDD7005EB525 /* test_client */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7671BFD2031EDD7005EB525 /* Build configuration list for PBXNativeTarget "test_client" */;
+			buildPhases = (
+				F11B0C7CBABBB92524107B27 /* [CP] Check Pods Manifest.lock */,
+				C7671BF32031EDD7005EB525 /* Sources */,
+				C7671BF42031EDD7005EB525 /* Frameworks */,
+				C7671BF52031EDD7005EB525 /* CopyFiles */,
+				F43383B490EA50CA77B4C4E3 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = test_client;
+			productName = test_client;
+			productReference = C7671BF72031EDD7005EB525 /* test_client */;
+			productType = "com.apple.product-type.tool";
+		};
 		C7D5F1541DB0208200F5F4DD /* MOLFCMClient */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C7D5F15E1DB0208200F5F4DD /* Build configuration list for PBXNativeTarget "MOLFCMClient" */;
@@ -182,6 +242,9 @@
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = Google;
 				TargetAttributes = {
+					C7671BF62031EDD7005EB525 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					C7D5F1541DB0208200F5F4DD = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
@@ -204,6 +267,7 @@
 			targets = (
 				C7D5F1541DB0208200F5F4DD /* MOLFCMClient */,
 				C7D5F1661DB021F600F5F4DD /* MOLFCMClientTests */,
+				C7671BF62031EDD7005EB525 /* test_client */,
 			);
 		};
 /* End PBXProject section */
@@ -282,6 +346,24 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MOLFCMClient/Pods-MOLFCMClient-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F11B0C7CBABBB92524107B27 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-test_client-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		F12099089B8C289E02F43BFF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -300,9 +382,33 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F43383B490EA50CA77B4C4E3 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-test_client/Pods-test_client-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C7671BF32031EDD7005EB525 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7671BFE2031EF47005EB525 /* MOLFCMClient.m in Sources */,
+				C7671BFA2031EDD7005EB525 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C7D5F1511DB0208200F5F4DD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -330,6 +436,24 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		C7671BFB2031EDD7005EB525 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AFC69D50B92E9DDB838C186B /* Pods-test_client.debug.xcconfig */;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C7671BFC2031EDD7005EB525 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 047016489C9BBAFEEC14F0A4 /* Pods-test_client.release.xcconfig */;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		C7D5F15C1DB0208200F5F4DD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -462,6 +586,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C7671BFD2031EDD7005EB525 /* Build configuration list for PBXNativeTarget "test_client" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7671BFB2031EDD7005EB525 /* Debug */,
+				C7671BFC2031EDD7005EB525 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		C7D5F1501DB0208200F5F4DD /* Build configuration list for PBXProject "MOLFCMClient" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
