@@ -214,7 +214,11 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 - (void)connect {
   uint32_t ms = arc4random_uniform(_connectDelayMaxSeconds * 1000);
   NSTimeInterval jitter = ms / 1000.0;
-  [self performSelector:@selector(connectHelper) withObject:nil afterDelay:jitter];
+  // Use the main thread so the timer created by performSelector:withObject:afterDelay:
+  // is not lost if this method was called on a transient GCD worker thread.
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self performSelector:@selector(connectHelper) withObject:nil afterDelay:jitter];
+  });
 }
 
 - (void)connectHelper {
@@ -353,7 +357,8 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
   __weak __typeof(self) weakSelf = self;
   return ^(NSURLSession *session, NSURLSessionTask *task, NSError *error) {
     __typeof(self) strongSelf = weakSelf;
-    if (![task.response isKindOfClass:[NSHTTPURLResponse class]]) {
+    // task.response can be nil when an NSURLError* occurs
+    if (task.response && ![task.response isKindOfClass:[NSHTTPURLResponse class]]) {
       if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(nil, error);
       return;
     }
