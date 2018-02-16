@@ -63,11 +63,11 @@ static const uint32_t kDefaultConnectDelayMaxSeconds = 10;
 /**  The block to be called for every message. */
 @property(copy, nonatomic) MOLFCMMessageHandler messageHandler;
 
-/**  Property to keep track of FCM's reachability. */
-@property(nonatomic) BOOL reachable;
-
 /**  Is used throughout the class to reconnect to FCM after a connection loss. */
 @property SCNetworkReachabilityRef reachability;
+
+/**  Called by the reachability handler when the host becomes reachable. */
+- (void)reachabilityRestored;
 
 @end
 
@@ -77,11 +77,11 @@ static const uint32_t kDefaultConnectDelayMaxSeconds = 10;
 static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags,
                                 void *info) {
   dispatch_async(dispatch_get_main_queue(), ^{
-    MOLFCMClient *FCMClient = (__bridge MOLFCMClient *)info;
-    // Only call the setter when there is a change. This will filter out the redundant calls to this
-    // callback whenever the network interface states change.
-    if (FCMClient.reachable != (flags & kSCNetworkReachabilityFlagsReachable)) {
-      FCMClient.reachable = (flags & kSCNetworkReachabilityFlagsReachable);
+    if (flags & kSCNetworkReachabilityFlagsReachable) {
+      MOLFCMClient *FCMClient = (__bridge MOLFCMClient *)info;
+      SEL s = @selector(reachabilityRestored);
+      [NSObject cancelPreviousPerformRequestsWithTarget:FCMClient selector:s object:nil];
+      [FCMClient performSelector:s withObject:nil afterDelay:1];
     }
   });
 }
@@ -166,21 +166,24 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 }
 
 - (BOOL)isConnected {
-  return !_backoffSeconds;
+  for (NSURLSessionDataTask *dataTask in [self dataTasks]) {
+    if (dataTask.state == NSURLSessionTaskStateRunning) return YES;
+  }
+  return NO;
 }
 
 #pragma mark reachability methods
 
-/**  Called when self.reachable changes. */
-- (void)setReachable:(BOOL)reachable {
-  if (reachable) {
+- (void)reachabilityRestored {
 #ifdef DEBUG
-    NSString *log = @"Reachability restored. Reconnect after a backoff of %i seconds";
-    [self log:[NSString stringWithFormat:log, _backoffSeconds]];
+  NSString *log = @"Reachability restored. Reconnect after a backoff of %i seconds";
+  [self log:[NSString stringWithFormat:log, _backoffSeconds]];
 #endif
-    [self stopReachability];
-    [self performSelector:@selector(connectHelper) withObject:nil afterDelay:_backoffSeconds];
-  }
+  [self stopReachability];
+  dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, _backoffSeconds * NSEC_PER_SEC);
+  dispatch_after(t, dispatch_get_main_queue(), ^{
+    [self connectHelper];
+  });
 }
 
 /**  Start listening for network state changes on a background thread. */
@@ -213,8 +216,9 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
 - (void)connect {
   uint32_t ms = arc4random_uniform(_connectDelayMaxSeconds * 1000);
-  NSTimeInterval jitter = ms / 1000.0;
-  [self performSelector:@selector(connectHelper) withObject:nil afterDelay:jitter];
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
+    [self connectHelper];
+  });
 }
 
 - (void)connectHelper {
@@ -254,12 +258,20 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 }
 
 - (void)cancelConnections {
-  [_session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks,
-                                            NSArray *downloadTasks) {
-    for (NSURLSessionDataTask *dataTask in dataTasks) {
-      [dataTask cancel];
-    }
+  for (NSURLSessionDataTask *dataTask in [self dataTasks]) {
+    [dataTask cancel];
+  }
+}
+
+- (NSArray<NSURLSessionDataTask *> *)dataTasks {
+  __block NSArray *dataTasks;
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  [_session getTasksWithCompletionHandler:^(NSArray *data, NSArray *upload, NSArray *download) {
+    dataTasks = data;
+    dispatch_semaphore_signal(sema);
   }];
+  dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+  return dataTasks;
 }
 
 /**
@@ -353,7 +365,8 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
   __weak __typeof(self) weakSelf = self;
   return ^(NSURLSession *session, NSURLSessionTask *task, NSError *error) {
     __typeof(self) strongSelf = weakSelf;
-    if (![task.response isKindOfClass:[NSHTTPURLResponse class]]) {
+    // task.response can be nil when an NSURLError* occurs
+    if (task.response && ![task.response isKindOfClass:[NSHTTPURLResponse class]]) {
       if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(nil, error);
       return;
     }
