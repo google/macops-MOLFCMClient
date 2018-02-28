@@ -14,7 +14,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MOLFCMClient.h"
+#import <MOLFCMClient/MOLFCMClient.h>
 
 int main(int argc, const char * argv[]) {
   @autoreleasepool {

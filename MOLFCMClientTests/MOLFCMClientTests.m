@@ -14,10 +14,11 @@
 
 #import "MOLFCMClient.h"
 
-#import <MOLAuthenticatingURLSession.h>
-#import <OCMock/OCMock.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <XCTest/XCTest.h>
+
+#import <MOLAuthenticatingURLSession/MOLAuthenticatingURLSession.h>
+#import <OCMock/OCMock.h>
 
 /** MOLAuthenticatingURLSession testing extension. */
 @interface MOLAuthenticatingURLSession(Testing)
