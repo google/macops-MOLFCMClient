@@ -14,9 +14,9 @@
 
 #import "MOLFCMClient.h"
 
-#import "MOLAuthenticatingURLSession.h"
-
 #import <SystemConfiguration/SystemConfiguration.h>
+
+#import <MOLAuthenticatingURLSession/MOLAuthenticatingURLSession.h>
 
 /**  The FCM production host URL. */
 static NSString *const kFCMHost = @"https://fcm-stream.googleapis.com";
