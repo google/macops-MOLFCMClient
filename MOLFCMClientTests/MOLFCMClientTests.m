@@ -12,12 +12,11 @@
 ///    See the License for the specific language governing permissions and
 ///    limitations under the License.
 
-#import "MOLFCMClient.h"
-
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <XCTest/XCTest.h>
 
 #import <MOLAuthenticatingURLSession/MOLAuthenticatingURLSession.h>
+#import <MOLFCMClient/MOLFCMClient.h>
 #import <OCMock/OCMock.h>
 
 /** MOLAuthenticatingURLSession testing extension. */

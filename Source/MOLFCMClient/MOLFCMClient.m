@@ -372,15 +372,17 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
     }
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
     if (httpResponse.statusCode == 200) {
-      _backoffSeconds = 0;
+      strongSelf->_backoffSeconds = 0;
       [strongSelf connectHelper];
     } else if ([_fatalHTTPStatusCodes containsObject:@(httpResponse.statusCode)]) {
       if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(httpResponse, error);
     } else {
       // If no backoff is set, start out with 5 - 15 seconds.
       // If a backoff is already set, double it, with a max of kBackoffMaxSeconds.
-      _backoffSeconds = _backoffSeconds * 2 ?: arc4random_uniform(11) + 5;
-      if (_backoffSeconds > _backoffMaxSeconds) _backoffSeconds = _backoffMaxSeconds;
+      strongSelf->_backoffSeconds = strongSelf->_backoffSeconds * 2 ?: arc4random_uniform(11) + 5;
+      if (strongSelf->_backoffSeconds > strongSelf->_backoffMaxSeconds) {
+        strongSelf->_backoffSeconds = strongSelf->_backoffMaxSeconds;
+      }
 #ifdef DEBUG
       if (error) [strongSelf log:[NSString stringWithFormat:@"%@", error]];
 #endif
