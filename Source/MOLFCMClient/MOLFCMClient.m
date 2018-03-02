@@ -336,6 +336,24 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
   return [[[jo firstObject] lastObject] firstObject];
 }
 
+- (void)handleHTTPReponse:(NSHTTPURLResponse *)HTTPResponse error:(NSError *)error {
+  if (HTTPResponse.statusCode == 200) {
+    _backoffSeconds = 0;
+    [self connectHelper];
+  } else if ([_fatalHTTPStatusCodes containsObject:@(HTTPResponse.statusCode)]) {
+    if (self.connectionErrorHandler) self.connectionErrorHandler(HTTPResponse, error);
+  } else {
+    // If no backoff is set, start out with 5 - 15 seconds.
+    // If a backoff is already set, double it, with a max of kBackoffMaxSeconds.
+    _backoffSeconds = _backoffSeconds * 2 ?: arc4random_uniform(11) + 5;
+    if (_backoffSeconds > _backoffMaxSeconds) _backoffSeconds = _backoffMaxSeconds;
+#ifdef DEBUG
+    if (error) [self log:[NSString stringWithFormat:@"%@", error]];
+#endif
+    [self startReachability];
+  }
+}
+
 #pragma mark NSURLSession block property and methods
 
 /**
@@ -370,22 +388,8 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
       if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(nil, error);
       return;
     }
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
-    if (httpResponse.statusCode == 200) {
-      _backoffSeconds = 0;
-      [strongSelf connectHelper];
-    } else if ([_fatalHTTPStatusCodes containsObject:@(httpResponse.statusCode)]) {
-      if (strongSelf.connectionErrorHandler) strongSelf.connectionErrorHandler(httpResponse, error);
-    } else {
-      // If no backoff is set, start out with 5 - 15 seconds.
-      // If a backoff is already set, double it, with a max of kBackoffMaxSeconds.
-      _backoffSeconds = _backoffSeconds * 2 ?: arc4random_uniform(11) + 5;
-      if (_backoffSeconds > _backoffMaxSeconds) _backoffSeconds = _backoffMaxSeconds;
-#ifdef DEBUG
-      if (error) [strongSelf log:[NSString stringWithFormat:@"%@", error]];
-#endif
-      [strongSelf startReachability];
-    }
+    NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)task.response;
+    [strongSelf handleHTTPReponse:HTTPResponse error:error];
   };
 }
 
