@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MOLFCMClient'
-  s.version      = '1.6'
+  s.version      = '1.7'
   s.platform     = :osx, '10.9'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
   s.homepage     = 'https://github.com/google/macops-molfcmclient'
