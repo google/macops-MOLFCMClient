@@ -98,7 +98,13 @@ typedef void (^MOLFCMAcknowledgeErrorHandler)(NSDictionary *, NSError *);
  */
 - (void)acknowledgeMessage:(NSDictionary *)message;
 
-/**  Closes all FCM connections. Stops Reachability. Outstanding tasks will be canceled. */
+/**
+ *  Closes all FCM connections. Stops Reachability. Outstanding tasks will be canceled.
+ *
+ *  @note After disconnect is called the receiver is considered dead. A new MOLFCMClient object
+ *        will need to be created to begin listening for messages.
+ *  @note After disconnect the receiver can hold a reference to itself for up to 15 minutes.
+ */
 - (void)disconnect;
 
 @end
