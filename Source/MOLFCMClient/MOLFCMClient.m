@@ -254,7 +254,7 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
 - (void)disconnect {
   [self stopReachability];
-  [_session invalidateAndCancel];
+  [self cancelConnections];
 }
 
 - (void)cancelConnections {
