@@ -121,7 +121,7 @@ static void reachabilityHandler(SCNetworkReachabilityRef target, SCNetworkReacha
 
     _connectDelayMaxSeconds = connectDelayMax ?: kDefaultConnectDelayMaxSeconds;
     _backoffMaxSeconds = backoffMax ?: kDefaultBackoffMaxSeconds;
-    _fatalHTTPStatusCodes = fatalCodes ?: @[@302, @400, @403];
+    _fatalHTTPStatusCodes = fatalCodes ?: @[@302, @400, @401, @403, @404];
   }
   return self;
 }
