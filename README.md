@@ -17,11 +17,51 @@ MOLFCMClient *fcmClient = [[MOLFCMClient alloc] initWithFCMToken:token
 
 ## Installation
 
-Install using CocoaPods.
+#### Using CocoaPods
+
+Add the following line to your Podfile:
 
 ```
 pod 'MOLFCMClient'
 ```
+
+#### Using [Bazel](http://bazel.build)
+
+Add the following to your WORKSPACE:
+
+```
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+# Needed for MOLFCMClient
+git_repository(
+    name = "MOLCertificate",
+    remote = "https://github.com/google/macops-molcertificate.git",
+    tag = "v2.0",
+)
+
+# Needed for MOLFCMClient
+git_repository(
+    name = "MOLAuthenticatingURLSession",
+    remote = "https://github.com/google/macops-molauthenticatingurlsession.git",
+    tag = "v2.5",
+)
+
+git_repository(
+    name = "MOLFCMClient",
+    remote = "https://github.com/google/macops-molfmclient.git",
+    tag = "v2.0",
+)
+```
+
+And in your BUILD file, add MOLFCMClient as a dependency:
+
+<pre>
+objc_library(
+    name = "MyAwesomeApp_lib",
+    srcs = ["src/MyAwesomeApp.m", "src/MyAwesomeApp.h"],
+    <strong>deps = ["@MOLFCMClient//:MOLFCMClient"],</strong>
+)
+</pre>
 
 ## Documentation
 

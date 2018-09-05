@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MOLFCMClient'
-  s.version      = '1.8'
+  s.version      = '2.0'
   s.platform     = :osx, '10.9'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
   s.homepage     = 'https://github.com/google/macops-molfcmclient'
@@ -9,5 +9,5 @@ Pod::Spec.new do |s|
   s.source       = { :git => 'https://github.com/google/macops-molfcmclient.git',
                      :tag => "v#{s.version}" }
   s.source_files = 'Source/MOLFCMClient/*.{h,m}'
-  s.dependency 'MOLAuthenticatingURLSession', '~> 2.4'
+  s.dependency 'MOLAuthenticatingURLSession', '~> 2.5'
 end
